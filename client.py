@@ -22,11 +22,11 @@ import argparse
 # #############################################################################
 
 warnings.filterwarnings("ignore", category=UserWarning)
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Define hyper-parameters here
 # number of features = 3: Month, Hour, power
-hyper_parameters = {"num_features":3, "num_layers":1, "num_hidden_units":5, "batch_size":128, "epoch":300, "lr":3e-3, "seq_len":24, "step_len":24}
+hyper_parameters = {"num_features":3, "num_layers":1, "num_hidden_units":100, "batch_size":128, "epoch":200, "lr":5e-4, "seq_len":24, "step_len":24}
 
 class SequenceDataset(Dataset):
     def __init__(self, dataframe, target, features, sequence_length=6):
@@ -144,10 +144,10 @@ def train(model, trainLoader, testLoader, loss_function, optimizer, epoches):
     print(f"Test loss: {test_loss}")
 
     # Here is early stopping
-    # early_stopping(test_loss, model)
-    # if early_stopping.early_stop:
-    #   print("Early Stopped")
-    #   break
+    early_stopping(test_loss, model)
+    if early_stopping.early_stop:
+      print("Early Stopped")
+      break
   print(f"\nTime consumed: {datetime.now() - start_time}")
 
 def predict(testLoader, testDataset, model, loss_function):
@@ -162,19 +162,19 @@ def predict(testLoader, testDataset, model, loss_function):
     x, y = testDataset[i]
     label.append(y.reshape(-1))
     pred.append(predict_result[i * step_len:(i+1) * step_len].reshape(-1))
-    loss += loss_function(label[i], pred[i])
+    loss += loss_function(label[i-24], pred[i-24])
   combined["Predict"] = pred
   combined["Label"] = label
   loss /= len(testDataset)
   return combined, loss
 
 def load_data(path, file_name):
-  global trainloader, testloader, trainDataset, testDataset 
+  trainloader, testloader, trainDataset, testDataset = None, None, None, None
   os.chdir(path)
   # print(os.getcwd())
   df = pd.read_csv(file_name, index_col="Time Stamp")
   df = df.rename(index= dict(zip(df.index, [datetime.strptime(index, '%m/%d/%Y %H:%M:%S') for index in df.index])))
-  start = "2019-01-01"
+  start = "2020-01-01"
   end = "2021-12-31"
   df = df[start:end]
   
@@ -185,8 +185,8 @@ def load_data(path, file_name):
   df = df.iloc[:-hyper_parameters["step_len"]]
 
   # Generate train adn test dataframe
-  train_start = "2019-01-01"
-  test_start = "2021-12-28"
+  train_start = "2020-01-01"
+  test_start = "2021-12-20"
   df_train = df[train_start:test_start]
   df_test = df[test_start:]
 
@@ -207,6 +207,8 @@ def load_data(path, file_name):
 
   trainloader = DataLoader(trainDataset, batch_size=batch_size, shuffle=False)
   testloader = DataLoader(testDataset, batch_size=batch_size, shuffle=False)
+  
+  return trainloader, testloader, trainDataset, testDataset
 
 # #############################################################################
 # Federating the pipeline with Flower
@@ -249,14 +251,16 @@ class FlowerClient(fl.client.NumPyClient):
 # Start Flower client
 if __name__ == '__main__':
   global trainloader, testloader, trainDataset, testDataset 
-  trainloader, testloader, trainDataset, testDataset = None, None, None, None
   parser = argparse.ArgumentParser(description='Process commandline arguments',conflict_handler='resolve')
   parser.add_argument('--file_name','-f',type=str, required=True,help="File name")
   parser.add_argument('--path','-p',type=str, required=True,help="Path of the file")
   args = parser.parse_args()
   file_name = args.file_name
   path = args.path
-  load_data(path, file_name)
+  trainloader, testloader, trainDataset, testDataset = load_data(path, file_name)
 
   fl.client.start_numpy_client("[::]:8080", client=FlowerClient())
   print("Done!")
+  save_model_name = "trained_model.pt"
+  torch.save(net.state_dict(), save_model_name)
+  print(f"Trained model save to {os.getcwd()}/{save_model_name}")

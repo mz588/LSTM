@@ -1,5 +1,8 @@
 import flwr as fl
-num_clients = 5
+from datetime import datetime
+
+
+num_clients = 3
 strategy = fl.server.strategy.FedAvg(
   fraction_fit = 0.5,
   fraction_eval = 0.5,
@@ -8,9 +11,12 @@ strategy = fl.server.strategy.FedAvg(
   min_eval_clients = num_clients
 )
 
+# Get time
+start_time = datetime.now()
 # Start Flower server
 fl.server.start_server(
   "[::]:8080",
-  config={"num_rounds": 6},
+  config={"num_rounds": 3},
   strategy=strategy
 )
+print(f"\nTotal time consumed: {datetime.now() - start_time}")
