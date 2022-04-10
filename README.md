@@ -15,4 +15,4 @@ $ python3 client.py -f MILLWD.csv -p ./data
 $ python3 client.py -f WEST.csv -p ./data
 ```
 
-If you want to change the number of clients, see (server.py)[./server.py] and change `min_available_clients`. 
+If you want to change the number of clients, see [server.py](./server.py) and change `min_available_clients`. 
