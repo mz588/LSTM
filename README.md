@@ -10,8 +10,6 @@ Then run all clients:
 ```sh
 $ python3 client.py -f CAPITL.csv -p ./data
 $ python3 client.py -f N.Y.C..csv -p ./data
-$ python3 client.py -f CENTRL.csv -p ./data
-$ python3 client.py -f MILLWD.csv -p ./data
 $ python3 client.py -f WEST.csv -p ./data
 ```
 
