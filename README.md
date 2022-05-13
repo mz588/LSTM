@@ -6,6 +6,8 @@ The dataset used in the project are those collected and maintained by Cornell Un
 
 The data from March 2021 to April 2022 for Upson Hall, Carpenter Hall, and Sage Hall have been cleaned and stored in UpsonHall.csv, CarpenterHall.csv, and SageHall.csv for sampling rate of 5min and 1h. You can find them inside the `Cornell_data_5min` and `Cornell_data_1h` folder.
 
+Moreover, the script for cleaning the data is also included in preProcess.py.
+
 ## Description on the code structure
 As the title implies, we use LSTM in this project, which has been included in the library of Pytorch. 
 
