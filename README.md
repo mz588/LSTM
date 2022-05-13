@@ -31,7 +31,7 @@ $ python checkResult.py -f ../Cornell_data_5min/SageHall.csv -m short_trained_mo
 
 These are the examples for the short-term prediction, but they can also be applied to the long-term. One thing to notice is that the folder name should be changed from `../Cornell_data_5min/` to `../Cornell_data_1h/`. Also, the command for running checkResult.py need to add `-long` tag. Otherwise, the image results for short and long term will be written into one folder and thus mixed together.
 
-If you want to change the number of clients, see [server.py](./server.py) and change `min_available_clients`. 
+If you want to change the number of clients, see server.py and change `min_available_clients`. 
 
 ### Short-term prediction
 The target of short-term prediction is to predict the power load in the next hour. As the data used to perform the training on short-term prediction is sampled every 15 minutes, the LSTM model is connected to a fully-connected layer with 4 outputs. All the hyper-parameters are included in hyper_parameters dict in the client.py and checkResult.py file. Be sure to change them accordinly. 
