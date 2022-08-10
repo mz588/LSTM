@@ -39,3 +39,7 @@ The target of short-term prediction is to predict the power load in the next hou
 ### Long-term prediction
 The target of short-term prediction is to predict the power load in the next 24h. As the data used to perform the training on long-term prediction is the aggregated data for 1 hour, the LSTM model is connected to a fully-connected layer with 24 outputs.
 
+## Some future work
+1. Try to use weather data as features.
+2. Try more rounds of update on weights in server model and less epoches on clients.
+3. Try other parameters for weighted averaging.
